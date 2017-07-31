@@ -1,1 +1,3 @@
-Test input file
+nnf(-(p => q v r),X) .
+clause_form(F,all(x, all( y, p(x,y) => q(x) ) ) ) .
+writeln( F ) .
