@@ -18,66 +18,93 @@
    con priorita' 500 e associativita' fx
 Attenzione: --p da` errore, -(-p) */
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%% MAIN %%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 main :-
 	read_file_to_terms('./input.txt',L,[]),
-	maplist(writeln, L),
-	clause_form(F,all(x, all( y, p(x,y) => q(x) ) ) ),
-	maplist(writeln, F) .
-	
+	maplist(call, L).
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% forma normale negativa
-nnf(A => B, F v G) :- !,
-	nnf(-A,F), nnf(B,G).
-nnf(-(A => B), F & G) :- !,
-	nnf(A,F), nnf(-B,G).
-nnf(A <=> B, F) :- !,
-	nnf((A => B) & (B => A),F).
-nnf(-(A <=> B), F) :- !,
-	nnf(-((A => B) & (B => A)),F).
-nnf(A v B, F v G) :- !,
-	nnf(A,F), nnf(B,G).
-nnf(-(A v B), F & G) :- !,
-	nnf(-A,F), nnf(-B,G).
-nnf(A & B, F & G) :- !,
-	nnf(A,F), nnf(B,G).
-nnf(-(A & B), F v G) :- !,
-	nnf(-A,F), nnf(-B,G).
-nnf(-(-A),F) :- !, nnf(A,F).
-nnf(all(X,A),all(X,F)) :- !, nnf(A,F).
-nnf(-(all(X,A)),some(X,F)) :- !, nnf(-A,F).
-nnf(some(X,A),some(X,F)) :- !, nnf(A,F).
-nnf(-(some(X,A)),all(X,F)) :- !, nnf(-A,F).
-nnf(A,A).
+%%% forma normale negativa con writeln
+
+nnf(A,B) :-
+	cb_nnf(A,B),
+	writeln(B).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% CALLBACK forma normale negativa
+
+cb_nnf(A => B, F v G) :- !,
+	cb_nnf(-A,F), cb_nnf(B,G).
+cb_nnf(-(A => B), F & G) :- !,
+	cb_nnf(A,F), cb_nnf(-B,G).
+cb_nnf(A <=> B, F) :- !,
+	cb_nnf((A => B) & (B => A),F).
+cb_nnf(-(A <=> B), F) :- !,
+	cb_nnf(-((A => B) & (B => A)),F).
+cb_nnf(A v B, F v G) :- !,
+	cb_nnf(A,F), cb_nnf(B,G).
+cb_nnf(-(A v B), F & G) :- !,
+	cb_nnf(-A,F), cb_nnf(-B,G).
+cb_nnf(A & B, F & G) :- !,
+	cb_nnf(A,F), cb_nnf(B,G).
+cb_nnf(-(A & B), F v G) :- !,
+	cb_nnf(-A,F), cb_nnf(-B,G).
+cb_nnf(-(-A),F) :- !, cb_nnf(A,F).
+cb_nnf(all(X,A),all(X,F)) :- !, cb_nnf(A,F).
+cb_nnf(-(all(X,A)),some(X,F)) :- !, cb_nnf(-A,F).
+cb_nnf(some(X,A),some(X,F)) :- !, cb_nnf(A,F).
+cb_nnf(-(some(X,A)),all(X,F)) :- !, cb_nnf(-A,F).
+cb_nnf(A,A).
 
 /*
-?- nnf(-(p => q v r),X).
+?- cb_nnf(-(p => q v r),X).
 X = (p& (-q& -r))
 */
 
-%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% forma normale congiuntiva
-cnf(A,F) :-
-	nnf(A,NNFA),
-	distrib(NNFA,F).
 
-% applicazione delle leggi distributive
-distrib(A & B,F & G) :-
-	!, distrib(A,F), distrib(B,G).
-distrib(A v B,F) :-
-	distrib(A,A1 & A2), distrib(B,B1), !,
-	distrib((A1 v B1) & (A2 v B1),F).
-distrib(A v B,F) :-
-	distrib(A,A1), distrib(B,B1 & B2), !,
-	distrib((A1 v B1) & (A1 v B2),F).
-distrib(A v B,F v G) :-
-	!, distrib(A,F), distrib(B,G).
-distrib(A,A).
+cnf(A,B) :-
+	cb_cnf(A,B),
+	writeln(B).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% CALLBACK forma normale congiuntiva
+
+cb_cnf(A,F) :-
+	cb_nnf(A,NNFA),
+	cb_distrib(NNFA,F).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% applicazione delle leggi distributive
+
+distrib(A,B) :-
+	cb_distrib(A,B),
+	writeln(B).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% CALLBACK applicazione delle leggi distributive
+
+cb_distrib(A & B,F & G) :-
+	!, cb_distrib(A,F), cb_distrib(B,G).
+cb_distrib(A v B,F) :-
+	cb_distrib(A,A1 & A2), cb_distrib(B,B1), !,
+	cb_distrib((A1 v B1) & (A2 v B1),F).
+cb_distrib(A v B,F) :-
+	cb_distrib(A,A1), cb_distrib(B,B1 & B2), !,
+	cb_distrib((A1 v B1) & (A1 v B2),F).
+cb_distrib(A v B,F v G) :-
+	!, cb_distrib(A,F), cb_distrib(B,G).
+cb_distrib(A,A).
 
 /*
-?- cnf(p & (q & r => t), X).
+?- cb_cnf(p & (q & r => t), X).
 X = (p& (-q v -r v t)) 
 
-?- cnf(-(p & (q & r => t)), X).
+?- cb_cnf(-(p & (q & r => t)), X).
 X = ((-p v q)& (-p v r)& (-p v -t))
 */
 
@@ -134,12 +161,12 @@ rename(A,A).
 %%  e poi portare fuori i quantificatori
 prenex(F,G) :-
 	rename(F,F1),
-	nnf(F1,F2),
+	cb_nnf(F1,F2),
 	p_aux(F2,G).
 
 % Il primo argomento di p_aux e' in NNF.
 % Le regole per portare fuori i quantificatori dalla negazione
-%    sono gia' gestite da nnf.
+%    sono gia' gestite da cb_nnf.
 %% caso base: se A e' senza quantificatori, e' prenessa
 p_aux(A,A) :- qfree(A).
 % Regole per portare fuori dall'and
@@ -190,9 +217,17 @@ qfree(A) :-
 
 /* prenex(-(all(x,some(y,p(x,y))) v (all(x,p(x,c)) => some(y,q(y)))),F). */
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% forma di skolem
-skolem(A,F) :-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% forma di skolem
+
+skolem(A,B) :-
+	cb_skolem(A,B),
+	writeln(B).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% CALLBACK forma di skolem
+
+cb_skolem(A,F) :-
 	prenex(A,P),
 	skolemize(P,F,[]).
 % il terzo argomento contiene le variabili universali incontrate
@@ -209,21 +244,28 @@ skolemize(some(X,A),F,Vars) :-
 	skolemize(F1,F,Vars).
 skolemize(A,A,_).
 
-/*  skolem(all(x,p(x) => some(y,q(y) & r(x,y))),S). */
+/*  cb_skolem(all(x,p(x) => some(y,q(y) & r(x,y))),S). */
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Forma a clausole
-clause_form(F,Clauses) :-
-	skolem(F,Skolem),
-	cnf(Skolem,Cnf),
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Forma a clausole
+
+clause_form(A,B) :-
+	cb_clause_form(A,B),
+	writeln(B).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% CALLBACK Forma a clausole
+
+cb_clause_form(F,Clauses) :-
+	cb_skolem(F,Skolem),
+	cb_cnf(Skolem,Cnf),
 	split(Cnf,Clauses).
 split(A & B,Clauses) :-
 	!, split(A,C1), split(B,C2), append(C1,C2,Clauses).
 split(A,[A]).
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%% GENSYM
-%% come si potrebbe definire un gensym?
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% GENSYM
+%%% come si potrebbe definire un gensym?
 
 :- dynamic(counter/1).
 

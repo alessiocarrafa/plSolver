@@ -1,3 +1,10 @@
+/* negazione: - F
+   congiunzione: F & G
+   disgiunzione: F v G
+   implicazione: F => G
+   doppia implicazione: F <=> G
+   quantificazione universale: all(X,F)
+   quantificazione esistenziale: some(X,F)
+*/
+
 nnf(-(p => q v r),X) .
-clause_form(F,all(x, all( y, p(x,y) => q(x) ) ) ) .
-writeln( F ) .
