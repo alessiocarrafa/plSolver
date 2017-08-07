@@ -7,4 +7,17 @@
    quantificazione esistenziale: some(X,F)
 */
 
-nnf(-(p => q v r),X) .
+%%nnf(-(p => q v r),X) .
+
+/*
+
+prenex(-all(x, some(y, p(x, y))), F)
+genera un errore in 
+atom(some(y, p(x, y)))
+
+*/
+
+%% La funzione skolem porta di in forma normale prenessa
+%% e poi trasforma in forma normale di skolem
+
+skolem( -(all(x,some(y,p(x,y)))), F ) .

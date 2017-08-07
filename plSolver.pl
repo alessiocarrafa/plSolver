@@ -4,14 +4,14 @@
    disgiunzione: F v G
    implicazione: F => G
    doppia implicazione: F <=> G
-   quantificazione universale: all(X,F)
+   quantificazione universale: all(X,F) aka 
    quantificazione esistenziale: some(X,F)
 */
 %% Operatori: associativi a sinistra
 :- op(800, yfx, &).
-:- op(850, yfx, v).   
-:- op(870, yfx, =>).  
-:- op(880, yfx, <=>).  
+:- op(850, yfx, v).
+:- op(870, yfx, =>).
+:- op(880, yfx, <=>).
 
 /* http://www.swi-prolog.org/pldoc/man?section=opsummary
    l'operatore - e' predefinito,
@@ -115,20 +115,24 @@ X = ((-p v q)& (-p v r)& (-p v -t))
 %% replace(+Term,-Newterm,+X,+Y) =
 %% sostituendo X con Y in Term si ottiene Newterm
 %% Term puo' anche essere una lista
-replace(X,Y,X,Y) :- !.
-replace(X,X,_,_) :- atom(X), !.
+replace(X,Y,X,Y) :- writeln('replace(X,Y,X,Y)'), !.
+
 %% prima del caso generale, consideriamo le liste,
 %% con un cut
 %% La base replace([],[],_,_) non serve, [] e' un atom.
 replace([First|Rest],[NewFirst|NewRest],X,Y) :-
+	writeln('replace(List,List,X,Y)'),
 	!, replace(First,NewFirst,X,Y),
 	replace(Rest,NewRest,X,Y).
 %% altrimenti la prossima clausola si applicherebbe anche
 %% a liste, andando in loop.
 replace(Term,Newterm,X,Y) :-
+	writeln('replace(Term,Newterm,X,Y)'),
 	Term =.. List,
 	replace(List,Newlist,X,Y),
 	Newterm =.. Newlist.
+
+replace(X,X,_,_) :- writeln('replace(X,X,_,_)'), atom(X), !.
 	
 %% per generare nuovi simboli: gensym
 %%% http://www.swi-prolog.org/pldoc/man?section=predsummary
@@ -160,8 +164,11 @@ rename(A,A).
 %%% Ridenominare, mettere in NNF
 %%  e poi portare fuori i quantificatori
 prenex(F,G) :-
+	writeln('%%%% calling rename %%%%'),
 	rename(F,F1),
+	writeln('%%%% calling cb_nnf %%%%'),
 	cb_nnf(F1,F2),
+	writeln('%%%% calling p_aux %%%%'),
 	p_aux(F2,G).
 
 % Il primo argomento di p_aux e' in NNF.
@@ -228,7 +235,9 @@ skolem(A,B) :-
 %%% CALLBACK forma di skolem
 
 cb_skolem(A,F) :-
+	writeln('%%%% calling prenex %%%%'),
 	prenex(A,P),
+	writeln('%%%% calling skolemize %%%%'),
 	skolemize(P,F,[]).
 % il terzo argomento contiene le variabili universali incontrate
 skolemize(all(X,A),F,Vars) :-
