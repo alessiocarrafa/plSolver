@@ -20,4 +20,4 @@ atom(some(y, p(x, y)))
 %% La funzione skolem porta di in forma normale prenessa
 %% e poi trasforma in forma normale di skolem
 
-skolem( -(all(x,some(y,p(x,y)))), F ) .
+skolem( all(x,some(y,p(x,y))), F ) .

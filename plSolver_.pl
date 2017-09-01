@@ -4,7 +4,7 @@
    disgiunzione: F v G
    implicazione: F => G
    doppia implicazione: F <=> G
-   quantificazione universale: all(X,F) aka
+   quantificazione universale: all(X,F) aka 
    quantificazione esistenziale: some(X,F)
 */
 %% Operatori: associativi a sinistra
@@ -102,7 +102,7 @@ cb_distrib(A,A).
 
 /*
 ?- cb_cnf(p & (q & r => t), X).
-X = (p& (-q v -r v t))
+X = (p& (-q v -r v t)) 
 
 ?- cb_cnf(-(p & (q & r => t)), X).
 X = ((-p v q)& (-p v r)& (-p v -t))
@@ -115,29 +115,25 @@ X = ((-p v q)& (-p v r)& (-p v -t))
 %% replace(+Term,-Newterm,+X,+Y) =
 %% sostituendo X con Y in Term si ottiene Newterm
 %% Term puo' anche essere una lista
-replace(X,Y,X,Y) :- !.
-
-replace(X,X,_,_) :- atom(X), !.
+replace(X,Y,X,Y) :- writeln('replace(X,Y,X,Y)'), !.
 
 %% prima del caso generale, consideriamo le liste,
 %% con un cut
 %% La base replace([],[],_,_) non serve, [] e' un atom.
-
-Replace([First|[]],[NewFirst|[]],X,Y) :-
-	!, replace(First,NewFirst,X,Y).
-
 replace([First|Rest],[NewFirst|NewRest],X,Y) :-
+	writeln('replace(List,List,X,Y)'),
 	!, replace(First,NewFirst,X,Y),
 	replace(Rest,NewRest,X,Y).
-
 %% altrimenti la prossima clausola si applicherebbe anche
 %% a liste, andando in loop.
-
 replace(Term,Newterm,X,Y) :-
+	writeln('replace(Term,Newterm,X,Y)'),
 	Term =.. List,
 	replace(List,Newlist,X,Y),
 	Newterm =.. Newlist.
 
+replace(X,X,_,_) :- writeln('replace(X,X,_,_)'), atom(X), !.
+	
 %% per generare nuovi simboli: gensym
 %%% http://www.swi-prolog.org/pldoc/man?section=predsummary
 %%% vedi sotto GENSYM
@@ -187,7 +183,7 @@ p_aux(A & B,all(X,H) ) :-
 	 p_aux(B,G);
 	% oppure lo e' B
 	 p_aux(B,all(X,G)),
-	 p_aux(A,F)),
+	 p_aux(A,F)), 
 	p_aux(F & G,H).
 p_aux(A & B,some(X,H) ) :-
 	% se A, in forma prenessa, e' un esiste:
@@ -195,7 +191,7 @@ p_aux(A & B,some(X,H) ) :-
 	 p_aux(B,G);
 	% oppure lo e' B
 	 p_aux(B,some(X,G)),
-	 p_aux(A,F)),
+	 p_aux(A,F)), 
 	p_aux(F & G,H).
 %% casi analoghi per l'or
 p_aux(A v B,all(X,H) ) :-
@@ -204,7 +200,7 @@ p_aux(A v B,all(X,H) ) :-
 	 p_aux(B,G);
 	% oppure lo e' B
 	 p_aux(B,all(X,G)),
-	 p_aux(A,F)),
+	 p_aux(A,F)), 
 	p_aux(F v G,H).
 p_aux(A v B,some(X,H) ) :-
 	% se A, in forma prenessa, e' un esiste:
@@ -212,7 +208,7 @@ p_aux(A v B,some(X,H) ) :-
 	 p_aux(B,G);
 	% oppure lo e' B
 	 p_aux(B,some(X,G)),
-	 p_aux(A,F)),
+	 p_aux(A,F)), 
 	p_aux(F v G,H).
 p_aux(all(X,A),all(X,F)) :- !, p_aux(A,F).
 p_aux(some(X,A),some(X,F)) :- !, p_aux(A,F).
