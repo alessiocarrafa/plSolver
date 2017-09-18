@@ -123,7 +123,7 @@ replace(X,X,_,_) :- atom(X), !.
 %% con un cut
 %% La base replace([],[],_,_) non serve, [] e' un atom.
 
-Replace([First|[]],[NewFirst|[]],X,Y) :-
+replace([First|[]],[NewFirst|[]],X,Y) :-
 	!, replace(First,NewFirst,X,Y).
 
 replace([First|Rest],[NewFirst|NewRest],X,Y) :-
