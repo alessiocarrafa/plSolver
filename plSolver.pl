@@ -168,11 +168,11 @@ rename(A,A).
 %%% Ridenominare, mettere in NNF
 %%  e poi portare fuori i quantificatori
 prenex(F,G) :-
-	writeln('%%%% calling rename %%%%'),
+	write('%%%% calling rename with argument '), write( F ), writeln(' %%%%'),
 	rename(F,F1),
-	writeln('%%%% calling cb_nnf %%%%'),
+	write('%%%% calling cb_nnf with argument '), write( F1 ), writeln(' %%%%'),
 	cb_nnf(F1,F2),
-	writeln('%%%% calling p_aux %%%%'),
+	write('%%%% calling p_aux with argument '), write( F2 ), writeln(' %%%%'),
 	p_aux(F2,G).
 
 % Il primo argomento di p_aux e' in NNF.
@@ -239,9 +239,9 @@ skolem(A,B) :-
 %%% CALLBACK forma di skolem
 
 cb_skolem(A,F) :-
-	writeln('%%%% calling prenex %%%%'),
+	write('%%%% calling prenex with argument '), write( A ), writeln(' %%%%'),
 	prenex(A,P),
-	writeln('%%%% calling skolemize %%%%'),
+	write('%%%% calling skolemize with argument '), write( P ), write(' and '), write( F ), writeln(' %%%%'),
 	skolemize(P,F,[]).
 % il terzo argomento contiene le variabili universali incontrate
 skolemize(all(X,A),F,Vars) :-
@@ -288,3 +288,42 @@ gen(Root,Symbol) :-
 	N1 is N+1,
 	asserta(counter(N1)),
 	atomic_concat(Root,N1,Symbol).
+
+flat([],[]).
+
+flat([X|_],Lista) :-
+	writeln('%%%flat%%%%'),
+	writeln(X),
+	is_list(X), !,
+	flat(X,Lista).
+
+flat([X|Resto],[X|Lista]) :-
+	flat(Resto,Lista).
+
+list_pairs([] , []).
+list_pairs([_], []).
+list_pairs([A,B|Xs0], [A-Z|Yss]) :-
+   append(Xs, [Z], [B|Xs0]),
+   list_pairs(Xs, Yss).
+
+append_list_to_list_of_list( [H, T], [Head, Tail] ) :-
+	append_list_to_list_of_list(H, Head),
+	append_list_to_list_of_list(T, Tail ), !.
+
+append_list_to_list_of_list( List, ListOfList ) :-
+	append( [List], [ListOfList] ), ! .
+
+clausole_append( All, [_|[]], Dest ) :-
+	append( [[All]], Dest ), ! .
+
+clausole_append( _, Clausole, Dest ) :-
+	append( [Clausole], Dest ), ! .
+
+
+explode( [First|Rest], [B|Tail] ) :-
+	explode( First, B ),
+	explode( Rest, Tail ).
+
+explode( A, B ) :-
+	A =.. [_|Args],
+	clausole_append( A, Args, B ) .
