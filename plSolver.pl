@@ -289,36 +289,11 @@ gen(Root,Symbol) :-
 	asserta(counter(N1)),
 	atomic_concat(Root,N1,Symbol).
 
-flat([],[]).
-
-flat([X|_],Lista) :-
-	writeln('%%%flat%%%%'),
-	writeln(X),
-	is_list(X), !,
-	flat(X,Lista).
-
-flat([X|Resto],[X|Lista]) :-
-	flat(Resto,Lista).
-
-list_pairs([] , []).
-list_pairs([_], []).
-list_pairs([A,B|Xs0], [A-Z|Yss]) :-
-   append(Xs, [Z], [B|Xs0]),
-   list_pairs(Xs, Yss).
-
-append_list_to_list_of_list( [H, T], [Head, Tail] ) :-
-	append_list_to_list_of_list(H, Head),
-	append_list_to_list_of_list(T, Tail ), !.
-
-append_list_to_list_of_list( List, ListOfList ) :-
-	append( [List], [ListOfList] ), ! .
-
 clausole_append( All, [_|[]], Dest ) :-
 	append( [[All]], Dest ), ! .
 
 clausole_append( _, Clausole, Dest ) :-
 	append( [Clausole], Dest ), ! .
-
 
 explode( [First|Rest], [B|Tail] ) :-
 	explode( First, B ),
