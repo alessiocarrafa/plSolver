@@ -10,8 +10,10 @@
 %% La funzione skolem porta di in forma normale prenessa
 %% e poi trasforma in forma normale di skolem
 %% skolem( all(x,some(y,p(x,y))), F ) .
+prenex( all( x, all( y, p( x,y ) ) => q( x ) ), F ) ,
+writeln(F).
 
-explode([p v q, -p v r, -q v r, -r], S) ,
-writeln(S).
-%%test( (p v q), not((p v q)), 0, 0 ) .
-%%A = [P,Q], B = [[R,T]], append( [A], B, S ), !.
+%% explode([p v q, -p v r, -q v r, -r], S) ,
+%% writeln(S).
+
+%% clause_form( all(x,some(y,p(x,y))), F ) .
